@@ -1,0 +1,144 @@
+body {
+  font-family: 'Tahoma', sans-serif;
+  // background-color: #F3EDC8;
+  border-color: azure;
+  // background: url("https://plus.unsplash.com/premium_photo-1663851785132-d0372e7801ca?q=80&w=2422&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") no-repeat; 
+  // background-size: cover;
+  background-position: center; 
+  background-image: -webkit-gradient();
+
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.no-list-style {
+  list-style: none;
+
+}
+
+.primary-1 {
+  color: #F3EDC8;
+}
+
+.primary-2 {
+  color: #EAD196;
+}
+
+.primary-3 {
+  color: #BF3131;
+}
+
+.primary-4 {
+  color: #7D0A0A;
+}
+
+.object-cover {
+  object-fit: cover;
+ }
+
+.w-100 {
+  width: 100%;
+ }
+
+.w-10 {
+  width: 10%;
+ }
+
+
+
+.w-80 {
+  width: 80%;
+ }
+
+.product-card {
+  width: 14vw;
+  height: 60vh;
+}
+
+.fs-s {
+  font-size: 0.6rem;
+ }
+
+.search-btn {
+
+  width: 1.8rem;
+  height: 1.8rem;
+ }
+
+.h-48 {
+  height: 48px;
+}
+
+.sm\:h-60 {
+  height: 60px;
+}
+
+.lg\:h-80 {
+  height: 80px;
+}
+
+.color-transition { 
+  background-color: #7D0A0A;
+} 
+
+.color-transition:hover {
+  background-color: #BF3131;
+ }
+
+
+.nav-link {
+  color: white;
+}
+
+.nav-link-active {
+  color: black;
+ }
+
+ 
+.nav-link:hover,
+a:hover {
+  color: #BF3131;
+ }
+
+
+a.active {
+  color: #7D0A0A;
+  font-weight: bold;
+ }
+
+
+a.visited {
+  color: white;
+ }
+
+.check-lg {
+  width: 1rem;
+  height: 1rem;
+}
+
+
+.text-shadow {
+  text-shadow: 1px 1px 2px #777;
+}
+
+.shadow-red {
+  box-shadow:  #7D0A0A 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+}
+
+
+.shadow-beige{
+  box-shadow:  #EAD196 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+}
+
+.card {
+transition: all 0.2s;
+}
+
+.card:hover {
+ transform: scale(1.1);
+}
+
+
+

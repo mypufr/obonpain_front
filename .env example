@@ -1,0 +1,10 @@
+PORT=3000
+PGHOST=localhost
+PGDATABASE=database
+PGUSER=user
+PGPASSWORD=mypassword
+
+DATABASE_URL= postgres://user:mypassword@localhost/database
+
+JWT_PRIVATE_KEY=ma_super_cle_sécurisée
+JWT_EXPIRE_IN=60

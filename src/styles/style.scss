@@ -1,0 +1,12 @@
+// style.scss : the index file of the directory "styles"
+// Option: Include parts of Bootstrap 
+
+// Include functions first (so we can manipulate colors, SVGs, calc, etc)
+@import "bootstrap/scss/functions";
+
+// Include remainder of requried Boostrap stylesheets 
+@import "./variables";
+@import "bootstrap/scss/bootstrap";
+
+// Include additional custom styles that override
+@import "./utilities";
