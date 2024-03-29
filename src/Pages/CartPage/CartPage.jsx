@@ -9,9 +9,9 @@ import { selectAllDates, getDatesStatus, getDatesError, fetchDeliveryDates } fro
 import { emptyCart } from "../../store/reducers/cartReducer.jsx";
 import { jwtDecode } from "jwt-decode";
 import NavBarDashboard from "../../components/NavBarDashboard/NavBarDashboard.jsx";
+import axios from "axios";
 
-import "./cart-style.scss";
-
+import "./style.scss";
 
 export default function CartPage() {
   
@@ -34,17 +34,16 @@ export default function CartPage() {
   const datesStatus = useSelector(getDatesStatus);
   const datesError = useSelector(getDatesError)
   
-
-const checkToken = ()=> {
   const token = localStorage.getItem("token"); 
-  if (token) {
+
+  const checkToken = ()=> {
+   if (token) {
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.dataUser.id;
     console.log(userId);
     dispatch(emptyCart());
     setDeliveryDate("");
     setDeliveryPlace("");
-
 
   } else {
    console.log("token is not found")
@@ -56,20 +55,32 @@ const checkToken = ()=> {
   const [deliveryPlace, setDeliveryPlace] = useState("");
   const [deliveryDates, setDeliveryDates] = useState([]);
   const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryPlaceId, setDeliveryPlaceId] = useState(0);
+  const [deliveryDateId, setDeliveryDateId] = useState(0);
   const [isLoading, setIsLoading]= useState(false);
 
   const changePlace = (e)=> {
     console.log(e.target.value);
     const selectedPlace = e.target.value;
-    console.log(selectedPlace)
+    console.log(selectedPlace) 
 
+    const selectedPlaceId = places.find((item)=> item.name === selectedPlace);
+    console.log(selectedPlaceId.id);
+    setDeliveryPlaceId(selectedPlaceId.id)
+  
    if(!deliveryPlace){
      setDeliveryPlace(selectedPlace)
    } 
     const filteredDates = dates.find((item)=> item.name === selectedPlace); // {}
-   console.log(filteredDates)// {id: 2, name: ,delivery_date:["","",""] }
+    console.log(filteredDates)// {id: 2, name: ,delivery_date:["","",""] }
     setDeliveryPlace(selectedPlace)
     setDeliveryDates(filteredDates.delivery_date); // ["","",""]
+  }
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   }
 
   function refreshPage(){
@@ -77,19 +88,27 @@ const checkToken = ()=> {
   }
 
 // wip : Submit the order
-  const handleOrderSubmit = (userId)=> {
+  const handleOrderSubmit = async(userId)=> {
    
-    setIsLoading(true);
-   
-    const orderList = products
+   setIsLoading(true);
+
+   try {
+    const response = await axios.get("http://localhost:3000/api/dates", config);
+    const allDates = response.data;
+    console.log(allDates);
+    const foundDateId = allDates.find((item) => item.date === deliveryDate);
+    console.log(foundDateId.id);
+
+
+    const orderList =await products
       .filter((item) => item.cart_quantity > 0 && item.cart_quantity !== null && item.cart_quantity !== '')
       .map((item) => ({
         bread_id:item.bread_type_id,
         quantity: item.cart_quantity,
         creator_id: userId,
         customer_id: userId,
-        // delivery_place_id: item.delivery_place_id,
-        // delivery_date_id: item.delivery_date_id,   
+        delivery_place_id: deliveryPlaceId,
+        delivery_date_id: foundDateId.id,   
         price: item.price,
       }));  
   
@@ -101,28 +120,30 @@ const checkToken = ()=> {
       } else if (!deliveryPlace || !deliveryDate){
         alert("Veuillez sélectionner à la fois le lieu et la date de livraison.");
       }
-        
+    
 
-      // const submitOrders = async(userId)=>{
-      //   try {
-      //     // navigate("/dashboard-client");
-      //     const OrdersRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,orderList ,{
-      //     headers: {
-      //       Authorization: `Bearer ${token}`
-      //     }
-      //   }
-      //     )
-      //   console.log(OrdersRes)
-        
-      //   }catch(error) {
-      //     console.error('Error posting orders:', error);
-      //   }
-      // }
-      // submitOrders(userId);
+      const submitOrders = async(userId)=>{
+        try {
+          // navigate("/dashboard-client");
+          const OrdersRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,orderList ,{
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+          )
+        console.log(OrdersRes)
+        }catch(error) {
+          console.error('Error posting orders:', error);
+        }
+      }
+      submitOrders(userId);
 
     setIsLoading(false);
-  }
 
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  }
 
     function formatDate(inputDateString) {
       const inputDate = new Date(inputDateString);
