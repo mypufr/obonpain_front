@@ -1,0 +1,21 @@
+textarea {
+  width: 100%;
+  height: 7rem;
+  padding: 2px;
+  outline: none;
+  resize: none;
+  font-size: 1rem;
+  border-radius: 10px;
+  border-color: rgb(225, 220, 220);
+}
+
+textarea:is(:focus, :valid) {
+  border-width: 1px;
+  border-color:  #c2b5ca;
+  padding:0.8rem;
+}
+
+
+textarea::webkit-scrollbar {
+  width: 0px;
+}

@@ -105,6 +105,18 @@ const cartSlice = createSlice({
       state.totalPrice = Number(totalPrice).toFixed(2);
       // console.log(state.total)
     },
+    emptyCart: (state) => {
+      let amount = 0;
+      let totalPrice;
+      state.products.forEach((item) => {
+        item.cart_quantity = amount;
+        totalPrice =0 ;
+      });
+      state.amount = amount;
+      console.log(state.amount)
+      state.totalPrice = Number(totalPrice).toFixed(2);
+      console.log(state.total)
+    },
   },
   extraReducers(builder) {
     builder
@@ -134,6 +146,8 @@ export const {
   removeItem,
   addItem,
   updateTotal,
+  emptyCart,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
+

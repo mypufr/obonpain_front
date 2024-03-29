@@ -1,7 +1,6 @@
-import React from "react";
-// import axios from "axios";
 import { useState } from "react";
 import { send } from "emailjs-com";
+import "./style.scss";
 
 export default function ContactPage() {
   const [messageData, setMessageData] = useState({
@@ -18,6 +17,7 @@ export default function ContactPage() {
       [e.target.name]: e.target.value,
     });
   };
+
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function ContactPage() {
                 className="form-control bg-light"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="Votre Nom"
+                placeholder="Votre Nom (obligatoire)"
                 required
                 onChange={onChange}
                 value={messageData.last_name}
@@ -69,7 +69,7 @@ export default function ContactPage() {
                 className="form-control bg-light"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="Votre Prénom"
+                placeholder="Votre Prénom (obligatoire)"
                 required
                 onChange={onChange}
                 value={messageData.first_name}
@@ -84,7 +84,7 @@ export default function ContactPage() {
                 className="form-control bg-light"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="Votre Email"
+                placeholder="Votre Email (obligatoire)"
                 required
                 onChange={onChange}
                 value={messageData.email}
@@ -99,18 +99,18 @@ export default function ContactPage() {
                 className="form-control bg-light"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="Votre Téléphone"
+                placeholder="Votre Téléphone (facultatif)"
                 onChange={onChange}
                 value={messageData.tel}
               />
             </div>
 
             <div className="input-group mb-3">
-              <input
+              <textarea
                 id="message"
                 name="message"
                 type="textarea"
-                className="form-control bg-light"
+                className="bg-light message_area"
                 aria-label="With textarea"
                 placeholder="Votre message..."
                 required

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {useSelector, useDispatch} from "react-redux";
 import Product from "../../components/Cart/Product.jsx";
@@ -7,7 +6,7 @@ import Order from "../../components/Cart/Order.jsx";
 import { selectAllProducts,getProductsStatus, getProductsError, fetchProducts, getTotalPrice, getTotalQuantity, updateTotal } from "../../store/reducers/cartReducer.jsx";
 import { selectAllPlaces, getPlacesStatus, getPlacesError, fetchDeliveryPlaces } from "../../store/reducers/deliveryReducer.jsx"
 import { selectAllDates, getDatesStatus, getDatesError, fetchDeliveryDates } from "../../store/reducers/deliveryDatesReducer.jsx"
-// import { selectToken, selectUserId, initToken } from "../../store/reducers/authReducer.jsx";
+import { emptyCart } from "../../store/reducers/cartReducer.jsx";
 import { jwtDecode } from "jwt-decode";
 import NavBarDashboard from "../../components/NavBarDashboard/NavBarDashboard.jsx";
 
@@ -35,17 +34,24 @@ export default function CartPage() {
   const datesStatus = useSelector(getDatesStatus);
   const datesError = useSelector(getDatesError)
   
-  // const token = useSelector(selectToken);
-  // const userId = useSelector(selectUserId);
-  
+
+const checkToken = ()=> {
   const token = localStorage.getItem("token"); 
-    
   if (token) {
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.dataUser.id;
     console.log(userId);
-}
+    dispatch(emptyCart());
+    setDeliveryDate("");
+    setDeliveryPlace("");
 
+
+  } else {
+   console.log("token is not found")
+   alert("Veuillez vous connecter d'abord à votre compte pour pouvoir passer la commande.")
+   navigate("/connexion");
+  }
+}
 
   const [deliveryPlace, setDeliveryPlace] = useState("");
   const [deliveryDates, setDeliveryDates] = useState([]);
@@ -66,8 +72,11 @@ export default function CartPage() {
     setDeliveryDates(filteredDates.delivery_date); // ["","",""]
   }
 
+  function refreshPage(){
+    window.location.reload(false);
+  }
 
-// wip : envoyer une commande
+// wip : Submit the order
   const handleOrderSubmit = (userId)=> {
    
     setIsLoading(true);
@@ -85,8 +94,14 @@ export default function CartPage() {
       }));  
   
       console.log(orderList, `Total:${total}€`);
-        // console.log(token)
-        // console.log(userId)
+      if (total== 0 && deliveryPlace && deliveryDate) {
+        alert("Veuillez selectionner au moins 1 article dans le panier!");
+        // refresh the page to empty the cart
+        refreshPage();
+      } else if (!deliveryPlace || !deliveryDate){
+        alert("Veuillez sélectionner à la fois le lieu et la date de livraison.");
+      }
+        
 
       // const submitOrders = async(userId)=>{
       //   try {
@@ -100,7 +115,7 @@ export default function CartPage() {
       //   console.log(OrdersRes)
         
       //   }catch(error) {
-      //     console.error('Error fetching orders:', error);
+      //     console.error('Error posting orders:', error);
       //   }
       // }
       // submitOrders(userId);
@@ -143,10 +158,9 @@ if (productsStatus !== 'suceeded' && placesStatus !== 'suceeded' && datesStatus 
 },[productsStatus, placesStatus, datesStatus, dispatch])
 
 
-// useEffect(()=>{
-//   dispatch(initToken())
-// },[])
-
+useEffect(()=>{
+  checkToken();
+}, []);
 
 
 useEffect(()=>{
@@ -157,27 +171,17 @@ let content;
 let cart;
 
 if (productsStatus === 'loading'){
-  
-    content = <p>Loading...</p>;
-
+    content = <p>Chargement en cours...</p>;
 } else if (productsStatus === 'suceeded') {
-
   content = products.map((product =>  
- 
     <Product key={product.id+(product.bread_type_name)} id={product.id} name={product.bread_type_name} photo={product.photo} weight={product.weight} price={(Number(product.price)).toFixed(2)} mould={product.mould_name} amount={product.cart_quantity}/>
     ))
-
   cart = products.map((product => 
-    
     <Order key={product.id} name={product.bread_type_name} weight={product.weight} price={(Number(product.price)).toFixed(2)} amount={product.cart_quantity} />
-  
     ))
-
-
 } else if (productsStatus === 'failed') {
     content = <p>{error}</p>
 }
-
     return (
       <>
     <div className="responsive-container">
@@ -238,19 +242,13 @@ if (productsStatus === 'loading'){
     {/* Panier */}
     <div className="mt-4 cart">
         <div className="d-flex flex-wrap" style={{width:"40vw"}}>
-
           <div className="container mb-3 mt-4" style={{width:"30vw"}}>
-          {/* <div className="">
-            <div className=" bg-white"> */}
             <div className="d-flex flex-column align-items-center cart-item">
               <h4 className="fw-bold"> Votre Panier</h4>
                 <p className="mt-2">Vous avez {amount} produit(s) dans votre panier</p>
             </div>
           
           {cart}
-
-          {/* </div>
-          </div> */}
 
           <div className="d-flex justify-content-between mt-4 cart-item">
             <p className="mb-0 h4 fw-bold">Prix total</p>
@@ -266,7 +264,8 @@ if (productsStatus === 'loading'){
               <p className="mb-0">{deliveryPlace}</p>
 
               {deliveryDate &&(
-              <p className="mb-0 text-primary-4">le {formatDate(deliveryDate)}</p>)}
+              <p className="mb-0 text-primary-4">le {formatDate(deliveryDate)}</p>)
+              }
             </div>
             )}
 
@@ -281,11 +280,6 @@ if (productsStatus === 'loading'){
       </div>
     
       </section>
-
-
-
-
-
 
       </div>
      </>
