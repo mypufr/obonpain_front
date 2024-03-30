@@ -10,6 +10,7 @@ import { emptyCart } from "../../store/reducers/cartReducer.jsx";
 import { jwtDecode } from "jwt-decode";
 import NavBarDashboard from "../../components/NavBarDashboard/NavBarDashboard.jsx";
 import axios from "axios";
+// import OrderDetails from "../../components/Cart/OrderDetails.jsx";
 
 import "./style.scss";
 
@@ -34,12 +35,23 @@ export default function CartPage() {
   const datesStatus = useSelector(getDatesStatus);
   const datesError = useSelector(getDatesError)
   
-  const token = localStorage.getItem("token"); 
+  const [deliveryPlace, setDeliveryPlace] = useState("");
+  const [deliveryDates, setDeliveryDates] = useState([]);
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryPlaceId, setDeliveryPlaceId] = useState(0);
+  const [deliveryDateId, setDeliveryDateId] = useState(0);
+  const [userId, setUserId] = useState(0);
+  const [orderList, setOrderList] = useState([]);
 
+  const [isLoading, setIsLoading]= useState(false);
+
+  const token = localStorage.getItem("token"); 
+  
+  
   const checkToken = ()=> {
    if (token) {
     const decodedToken = jwtDecode(token);
-    const userId = decodedToken.dataUser.id;
+    setUserId(decodedToken.dataUser.id);
     console.log(userId);
     dispatch(emptyCart());
     setDeliveryDate("");
@@ -51,13 +63,6 @@ export default function CartPage() {
    navigate("/connexion");
   }
 }
-
-  const [deliveryPlace, setDeliveryPlace] = useState("");
-  const [deliveryDates, setDeliveryDates] = useState([]);
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [deliveryPlaceId, setDeliveryPlaceId] = useState(0);
-  const [deliveryDateId, setDeliveryDateId] = useState(0);
-  const [isLoading, setIsLoading]= useState(false);
 
   const changePlace = (e)=> {
     console.log(e.target.value);
@@ -83,14 +88,24 @@ export default function CartPage() {
     }
   }
 
-  function refreshPage(){
-    window.location.reload(false);
-  }
 
 // wip : Submit the order
-  const handleOrderSubmit = async(userId)=> {
+  const handleOrderSubmit = async()=> {
    
    setIsLoading(true);
+  
+   if((!deliveryPlace || !deliveryDate)){
+    alert("Veuillez sélectionner à la fois le lieu et la date de livraison.");
+    setIsLoading(false);
+    return;
+  }
+
+  if (total== 0) {
+    alert("Veuillez selectionner au moins 1 article dans le panier!");
+    // refresh the page to empty the cart
+    setIsLoading(false);
+    return;
+  } 
 
    try {
     const response = await axios.get("http://localhost:3000/api/dates", config);
@@ -98,53 +113,71 @@ export default function CartPage() {
     console.log(allDates);
     const foundDateId = allDates.find((item) => item.date === deliveryDate);
     console.log(foundDateId.id);
+    sessionStorage.setItem('deliveryDate', JSON.stringify(foundDateId.date));
+    sessionStorage.setItem('deliveryPlace', JSON.stringify(deliveryPlace));
+    const testDeliveryDate = JSON.parse(sessionStorage.getItem("deliveryDate"));
+    const testDeliveryPlace = JSON.parse(sessionStorage.getItem("deliveryPlace"));
+    console.log(testDeliveryDate);
+    console.log(testDeliveryPlace);
 
-
-    const orderList =await products
+    const orderList = await products
       .filter((item) => item.cart_quantity > 0 && item.cart_quantity !== null && item.cart_quantity !== '')
       .map((item) => ({
         bread_id:item.bread_type_id,
+        // bread_name:item.bread_type_name,
+        // weight: item.weight,
         quantity: item.cart_quantity,
         creator_id: userId,
         customer_id: userId,
         delivery_place_id: deliveryPlaceId,
         delivery_date_id: foundDateId.id,   
-        price: item.price,
+        price: Number(item.price),
       }));  
   
       console.log(orderList, `Total:${total}€`);
-      if (total== 0 && deliveryPlace && deliveryDate) {
-        alert("Veuillez selectionner au moins 1 article dans le panier!");
-        // refresh the page to empty the cart
-        refreshPage();
-      } else if (!deliveryPlace || !deliveryDate){
-        alert("Veuillez sélectionner à la fois le lieu et la date de livraison.");
-      }
+
+
+      const orderListWithName = await products
+      .filter((item) => item.cart_quantity > 0 && item.cart_quantity !== null && item.cart_quantity !== '')
+      .map((item) => ({
+        bread_id:item.bread_type_id,
+        bread_name:item.bread_type_name,
+        
+        weight: item.weight,
+        quantity: item.cart_quantity,
+        creator_id: userId,
+        customer_id: userId,
+        delivery_place_id: deliveryPlaceId,
+        delivery_date_id: foundDateId.id,   
+        price: Number(item.price),
+        total:total,
+      }));  
+  
+
+      console.log(orderListWithName,);
+
+      sessionStorage.setItem('orderInfo', JSON.stringify(orderListWithName))
+      const testOrderInfo = JSON.parse(sessionStorage.getItem("orderInfo"));
+      console.log(testOrderInfo);
+      navigate("/detail-commande");
     
-
-      const submitOrders = async(userId)=>{
-        try {
-          // navigate("/dashboard-client");
-          const OrdersRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,orderList ,{
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-          )
-        console.log(OrdersRes)
-        }catch(error) {
-          console.error('Error posting orders:', error);
-        }
-      }
-      submitOrders(userId);
-
-    setIsLoading(false);
+      // setOrderList(orderList);
+    //  alert(`Voici votre commande:${orderList}`)
+        //   const submitOrderRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,
+        //   orderList,
+        //   {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // }
+        //   )
+        // console.log(submitOrderRes)
+        setIsLoading(false);
 
   } catch (error) {
-    throw new Error(error.message);
+    return error.message;
   }
   }
-
     function formatDate(inputDateString) {
       const inputDate = new Date(inputDateString);
   
@@ -306,3 +339,4 @@ if (productsStatus === 'loading'){
      </>
     )
 }
+

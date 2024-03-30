@@ -60,7 +60,8 @@ export const fetchProducts = createAsyncThunk(
           return item;
         }
       });
-      console.log(updatedProductsList);
+      // console.log(updatedProductsList);
+      localStorage.setItem('testProducts', JSON.stringify(updatedProductsList));
       return updatedProductsList;
     } catch (err) {
       return err.message;
@@ -113,9 +114,9 @@ const cartSlice = createSlice({
         totalPrice =0 ;
       });
       state.amount = amount;
-      console.log(state.amount)
+      // console.log(state.amount)
       state.totalPrice = Number(totalPrice).toFixed(2);
-      console.log(state.total)
+      // console.log(state.total)
     },
   },
   extraReducers(builder) {
@@ -150,4 +151,3 @@ export const {
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
-
