@@ -7,18 +7,18 @@ export default function SignInForm() {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     // données de test
-    last_name: "test",
-    first_name: "test",
-    email: "test@gmail.com",
-    password: "0606060606",
-    phone: "0606060606",
-    adress: "233 rue du bac",
-    zip_code: "59193",
-    city: "lille",
-    role: "client",
+    last_name: "",
+    first_name: "",
+    email: "",
+    password: "",
+    phone: "",
+    adress: "",
+    zip_code: "",
+    city: "",
+    role: "",
     status: false,
     agreement: false,
-    passwordConfirm: "0606060606",
+    passwordConfirm: "",
   });
 
   const onChange = (e) => {
@@ -27,6 +27,21 @@ export default function SignInForm() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const onBlurPhone = () => {
+    const phoneRegex = /^(0|\+33|0033)[1-9]([-. ]?[0-9]{2}){4}$/;
+    if (!phoneRegex.test(credentials.phone)) {
+      alert("Veuillez saisir un numéro de téléphone français valide.");
+    }
+  };
+  
+  const onBlurEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+    if (!emailRegex.test(credentials.email)) {
+      alert("Veuillez entrer une adresse e-mail valide.");
+    }
+  };
+
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -51,19 +66,21 @@ export default function SignInForm() {
     <form onSubmit={onSubmit}>
       <input
         id="firstname"
-        name="firstname"
+        name="first_name"
         type="text"
-        placeholder="prénom"
+        placeholder="Prénom"
         onChange={onChange}
         value={credentials.first_name}
+        required
       />
       <input
         id="lastname"
-        name="lastname"
+        name="last_name"
         type="text"
         placeholder="Nom"
         value={credentials.last_name}
         onChange={onChange}
+        required
       />
       <input
         id="email"
@@ -71,7 +88,9 @@ export default function SignInForm() {
         type="email"
         placeholder="email"
         onChange={onChange}
+        onBlur={onBlurEmail}
         value={credentials.email}
+        required
       />
       <input
         id="phone"
@@ -79,6 +98,7 @@ export default function SignInForm() {
         type="tel"
         placeholder="Votre N° téléphone"
         onChange={onChange}
+        onBlur={onBlurPhone}
         value={credentials.phone}
       />
       <input
@@ -86,8 +106,10 @@ export default function SignInForm() {
         name="zip_code"
         type="text"
         placeholder="Code postal"
+        pattern="[0-9]{5}"
         onChange={onChange}
         value={credentials.zip_code}
+        required
       />
       <input
         id="adress"
@@ -109,17 +131,21 @@ export default function SignInForm() {
         id="password"
         name="password"
         type="password"
-        placeholder="Password"
+        placeholder="Mot de passe"
         onChange={onChange}
         value={credentials.password}
+        minLength={8}
+        required
       />{" "}
       <input
         id="passwordConfirm"
         name="passwordConfirm"
         type="password"
-        placeholder="passwordConfirm"
+        placeholder="Confirmer votre mot de passe"
         onChange={onChange}
         value={credentials.passwordConfirm}
+        minLength={8}
+        required
       />
       <input
         id="agreement,"

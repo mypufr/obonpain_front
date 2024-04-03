@@ -61,7 +61,7 @@ export const fetchProducts = createAsyncThunk(
         }
       });
       // console.log(updatedProductsList);
-      localStorage.setItem('testProducts', JSON.stringify(updatedProductsList));
+      sessionStorage.setItem('testProducts', JSON.stringify(updatedProductsList));
       return updatedProductsList;
     } catch (err) {
       return err.message;

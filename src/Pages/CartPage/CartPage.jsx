@@ -10,9 +10,8 @@ import { emptyCart } from "../../store/reducers/cartReducer.jsx";
 import { jwtDecode } from "jwt-decode";
 import NavBarDashboard from "../../components/NavBarDashboard/NavBarDashboard.jsx";
 import axios from "axios";
-// import OrderDetails from "../../components/Cart/OrderDetails.jsx";
 
-import "./style.scss";
+import "./cart-style.scss";
 
 export default function CartPage() {
   
@@ -117,15 +116,15 @@ export default function CartPage() {
     sessionStorage.setItem('deliveryPlace', JSON.stringify(deliveryPlace));
     const testDeliveryDate = JSON.parse(sessionStorage.getItem("deliveryDate"));
     const testDeliveryPlace = JSON.parse(sessionStorage.getItem("deliveryPlace"));
-    console.log(testDeliveryDate);
-    console.log(testDeliveryPlace);
+    const testProducts = JSON.parse(sessionStorage.getItem("testProducts"));
+    // console.log(testDeliveryDate);
+    // console.log(testDeliveryPlace);
+    // console.log(testProducts);
 
     const orderList = await products
       .filter((item) => item.cart_quantity > 0 && item.cart_quantity !== null && item.cart_quantity !== '')
       .map((item) => ({
         bread_id:item.bread_type_id,
-        // bread_name:item.bread_type_name,
-        // weight: item.weight,
         quantity: item.cart_quantity,
         creator_id: userId,
         customer_id: userId,
@@ -142,7 +141,7 @@ export default function CartPage() {
       .map((item) => ({
         bread_id:item.bread_type_id,
         bread_name:item.bread_type_name,
-        
+        mould:item.mould_name,
         weight: item.weight,
         quantity: item.cart_quantity,
         creator_id: userId,
@@ -151,27 +150,26 @@ export default function CartPage() {
         delivery_date_id: foundDateId.id,   
         price: Number(item.price),
         total:total,
+        image:item.photo,
       }));  
   
 
-      console.log(orderListWithName,);
+      // console.log(orderListWithName);
 
       sessionStorage.setItem('orderInfo', JSON.stringify(orderListWithName))
       const testOrderInfo = JSON.parse(sessionStorage.getItem("orderInfo"));
       console.log(testOrderInfo);
       navigate("/detail-commande");
-    
-      // setOrderList(orderList);
-    //  alert(`Voici votre commande:${orderList}`)
-        //   const submitOrderRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,
-        //   orderList,
-        //   {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // }
-        //   )
-        // console.log(submitOrderRes)
+
+          const submitOrderRes = await axios.post(`http://localhost:3000/api/users/${userId}/orders`,
+          orderList,
+          {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+          )
+        console.log(submitOrderRes)
         setIsLoading(false);
 
   } catch (error) {
